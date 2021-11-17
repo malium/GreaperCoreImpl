@@ -68,7 +68,7 @@ namespace greaper::core
 		void OnChangingDefault(IApplication* newDefault)override
 		{
 			UNUSED(newDefault);
-			Break("Cannot change the full application on runtime.");
+			Break("Cannot change the full application at runtime.");
 		}
 
 		ChangingDefaultEvt_t* const GetChangingDefaultEvent() { return nullptr; }
@@ -105,8 +105,6 @@ namespace greaper::core
 
 		bool AppHasToStop()const override { return m_HasToStop; }
 
-		void AppMarkToStop()override { m_HasToStop = true; }
-
 		void StopApplication()override;
 
 		OnCloseEvent_t* const GetOnCloseEvent()override { return &m_OnClose; }
@@ -119,13 +117,15 @@ namespace greaper::core
 
 		const StringView& GetCompilationInfo()const override
 		{
+			static constexpr StringView gCompilationInfo = 
 #if GREAPER_DEBUG
-			return "DEBUG"sv;
+			"DEBUG"sv;
 #elif GREAPER_FRELEASE
-			return "PUBLIC"sv;
+			"PUBLIC"sv;
 #else
-			return "RELEASE"sv;
+			"RELEASE"sv;
 #endif
+			return gCompilationInfo;
 		}
 	};
 }
