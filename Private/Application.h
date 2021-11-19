@@ -25,6 +25,23 @@ namespace greaper::core
 		bool m_IsInitialized;
 		bool m_HasToStop;
 
+		struct LibInfo
+		{
+			IGreaperLibrary* Lib;
+			UnorderedMap<StringView, size_t> IntefaceNameMap;
+			UnorderedMap<Uuid, size_t> InterfaceUuidMap;
+			Vector<IInterface*> Interfaces;
+		};
+
+		UnorderedMap<StringView, size_t> m_LibraryNameMap;
+		UnorderedMap<Uuid, size_t> m_LibraryUuidMap;
+		Vector<LibInfo> m_Libraries;
+
+		UnorderedMap<StringView, size_t> m_ActiveInterfaceNameMap;
+		UnorderedMap<Uuid, size_t> m_ActiveInterfaceUuidMap;
+		Vector<IInterface*> m_ActiveInterfaces;
+
+		void AddGreaperLibrary(IGreaperLibrary* library);
 		void LoadConfigLibraries();
 
 	public:
@@ -77,7 +94,7 @@ namespace greaper::core
 
 		Result<IGreaperLibrary*> RegisterGreaperLibrary(const WStringView& libPath)override;
 
-		Result<IGreaperLibrary*> GetGreaperLibrary(const WStringView& libraryName)override;
+		Result<IGreaperLibrary*> GetGreaperLibrary(const StringView& libraryName)override;
 
 		Result<IGreaperLibrary*> GetGreaperLibrary(const Uuid& libraryUUID)override;
 

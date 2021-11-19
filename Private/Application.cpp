@@ -9,9 +9,29 @@
 using namespace greaper;
 using namespace greaper::core;
 
+void Application::AddGreaperLibrary(IGreaperLibrary* library)
+{
+	const auto id = m_Libraries.size();
+	m_LibraryNameMap.insert_or_assign(library->GetLibraryName(), id);
+	m_LibraryUuidMap.insert_or_assign(library->GetLibraryUuid(), id);
+	LibInfo info;
+	info.Lib = library;
+	m_Libraries.push_back(std::move(info));
+}
+
 void Application::LoadConfigLibraries()
 {
-
+	if (m_Config.GreaperLibraries == nullptr)
+		return;
+	for (uint32 i = 0; i < m_Config.GreaperLibraryCount; ++i)
+	{
+		auto res = RegisterGreaperLibrary(m_Config.GreaperLibraries[i]);
+		if (res.HasFailed())
+		{
+			m_Library->LogWarning(res.GetFailMessage());
+			continue;
+		}
+	}
 }
 
 Application::Application()
@@ -109,10 +129,47 @@ EmptyResult Application::RegisterGreaperLibrary(IGreaperLibrary* library)
 
 Result<IGreaperLibrary*> Application::RegisterGreaperLibrary(const WStringView& libPath)
 {
-	return CreateFailure<IGreaperLibrary*>("Unfinished function '" FUNCTION_FULL "'.");
+	Library lib{ libPath };
+	if (!lib.IsOpen())
+	{
+		return CreateFailure<IGreaperLibrary*>(Format(
+			"Trying to register a GreaperLibrary with path '%S', but couldn't be openned.", libPath.data()));
+	}
+	auto fn = lib.GetFunctionT<void*>("_Greaper"sv);
+	if (fn == nullptr)
+	{
+		return CreateFailure<IGreaperLibrary*>(Format(
+			"Trying to register a GreaperLibrary with path '%S', but does not comply with Greaper modular protocol.",
+			libPath.data()));
+	}
+	auto gLib = reinterpret_cast<IGreaperLibrary*>(fn());
+	if (gLib == nullptr)
+	{
+		return CreateFailure<IGreaperLibrary*>(Format(
+			"Trying to register a GreaperLibrary with path '%S', but the library returned a nullptr GreaperLibrary.",
+			libPath.data()));
+	}
+	auto uLib = GetGreaperLibrary(gLib->GetLibraryUuid());
+	if (uLib.IsOk() && uLib.GetValue() != nullptr)
+	{
+		return CreateFailure<IGreaperLibrary*>(Format(
+			"Trying to register a GreaperLibrary with path '%S', but its UUID '%s' its already registered.",
+			libPath.data(), gLib->GetLibraryUuid().ToString().c_str()));
+	}
+	auto nLib = GetGreaperLibrary(gLib->GetLibraryName());
+	if (nLib.IsOk() && nLib.GetValue() != nullptr)
+	{
+		return CreateFailure<IGreaperLibrary*>(Format(
+			"Trying to register a GreaperLibrary with path '%S', but its name '%s' its already registered.",
+			libPath.data(), gLib->GetLibraryName().data()));
+	}
+
+	AddGreaperLibrary(gLib);
+	gLib->InitLibrary(this);
+	return CreateResult(gLib);
 }
 
-Result<IGreaperLibrary*> Application::GetGreaperLibrary(const WStringView& libraryName)
+Result<IGreaperLibrary*> Application::GetGreaperLibrary(const StringView& libraryName)
 {
 	return CreateFailure<IGreaperLibrary*>("Unfinished function '" FUNCTION_FULL "'.");
 }
