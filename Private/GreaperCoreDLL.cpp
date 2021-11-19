@@ -4,6 +4,7 @@
 ***********************************************************************************/
 
 #include "GreaperCoreDLL.h"
+#include "Application.h"
 
 #if GREAPER_CORE_DLL
 extern greaper::core::GreaperCoreLibrary* gCoreLibrary = nullptr;
@@ -47,12 +48,20 @@ bool greaper::core::GreaperCoreLibrary::RegisterProperty(IProperty* property)
 	return false;
 }
 
-void greaper::core::GreaperCoreLibrary::InitLibrary(IApplication* app)
+void greaper::core::GreaperCoreLibrary::InitLibrary(Library lib, IApplication* app)
 {
+	m_Library = std::move(lib);
+	m_Application = app;
 }
 
 void greaper::core::GreaperCoreLibrary::InitManagers()
 {
+	if (m_Application != nullptr)
+	{
+		LogError(Format("Trying to Initialize the Managers of the GreaperLibrary '%s', but IApplication was already initialized.", LibraryName.data()));
+		return;
+	}
+	m_Application = Construct<Application>();
 }
 
 void greaper::core::GreaperCoreLibrary::InitProperties()
@@ -65,6 +74,7 @@ void greaper::core::GreaperCoreLibrary::InitReflection()
 
 void greaper::core::GreaperCoreLibrary::DeinitLibrary()
 {
+	m_Application->Deinitialize();
 }
 
 greaper::Vector<greaper::IProperty*> greaper::core::GreaperCoreLibrary::GetPropeties() const

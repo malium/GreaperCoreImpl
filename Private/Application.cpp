@@ -165,7 +165,7 @@ Result<IGreaperLibrary*> Application::RegisterGreaperLibrary(const WStringView& 
 	}
 
 	AddGreaperLibrary(gLib);
-	gLib->InitLibrary(this);
+	gLib->InitLibrary(std::move(lib), this);
 	return CreateResult(gLib);
 }
 

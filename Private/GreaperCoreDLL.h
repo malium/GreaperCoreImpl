@@ -18,7 +18,7 @@ namespace greaper::core
 	class GreaperCoreLibrary : public IGreaperLibrary
 	{
 		bool RegisterProperty(IProperty* property)override;
-		IApplication* m_Application;
+		IApplication* m_Application = nullptr;
 		Library m_Library;
 
 	public:
@@ -27,7 +27,7 @@ namespace greaper::core
 		
 		GreaperCoreLibrary() = default;
 
-		void InitLibrary(IApplication* app)override;
+		void InitLibrary(Library lib, IApplication* app)override;
 
 		void InitManagers()override;
 
