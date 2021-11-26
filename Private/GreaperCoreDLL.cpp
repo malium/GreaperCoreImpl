@@ -72,9 +72,18 @@ void greaper::core::GreaperCoreLibrary::InitReflection()
 {
 }
 
-void greaper::core::GreaperCoreLibrary::DeinitLibrary()
+void greaper::core::GreaperCoreLibrary::DeinitReflection()
+{
+}
+
+void greaper::core::GreaperCoreLibrary::DeinitManagers()
 {
 	m_Application->Deinitialize();
+}
+
+void greaper::core::GreaperCoreLibrary::DeinitLibrary()
+{
+	
 }
 
 greaper::Vector<greaper::IProperty*> greaper::core::GreaperCoreLibrary::GetPropeties() const

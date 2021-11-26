@@ -104,7 +104,11 @@ namespace greaper::core
 
 		EmptyResult UnregisterInterface(IInterface* interface)override;
 
-		void MakeInterfaceDefault(IInterface* interface)override;
+		EmptyResult MakeInterfaceDefault(IInterface* interface)override;
+
+		EmptyResult StopInterfaceDefault(const Uuid& interfaceUUID)override;
+
+		EmptyResult StopInterfaceDefault(const StringView& interfaceName)override;
 
 		Result<IInterface*> GetInterface(const Uuid& interfaceUUID)const  override;
 

@@ -171,17 +171,84 @@ Result<IGreaperLibrary*> Application::RegisterGreaperLibrary(const WStringView& 
 
 Result<IGreaperLibrary*> Application::GetGreaperLibrary(const StringView& libraryName)
 {
-	return CreateFailure<IGreaperLibrary*>("Unfinished function '" FUNCTION_FULL "'.");
+	if (auto findIT = m_LibraryNameMap.find(libraryName); findIT != m_LibraryNameMap.end())
+	{
+		if (m_Libraries.size() <= findIT->second)
+		{
+			return CreateFailure<IGreaperLibrary*>(Format("A GreaperLibrary with name '%s' was found, but the library list didn't have that library.", libraryName.data()));
+		}
+		auto& libInfo = m_Libraries[findIT->second];
+		return CreateResult(libInfo.Lib);
+	}
+
+	return CreateFailure<IGreaperLibrary*>(Format("Couldn't find the GreaperLibrary '%s'.", libraryName.data()));
 }
 
 Result<IGreaperLibrary*> Application::GetGreaperLibrary(const Uuid& libraryUUID)
 {
-	return CreateFailure<IGreaperLibrary*>("Unfinished function '" FUNCTION_FULL "'.");
+	if (const auto findIT = m_LibraryUuidMap.find(libraryUUID); findIT != m_LibraryUuidMap.end())
+	{
+		if (m_Libraries.size() <= findIT->second)
+		{
+			return CreateFailure<IGreaperLibrary*>(Format("A GreaperLibrary with UUID '%s' was found, but the library list didn't have that library.", libraryUUID.ToString().c_str()));
+		}
+		auto& libInfo = m_Libraries[findIT->second];
+		return CreateResult(libInfo.Lib);
+	}
+
+	return CreateFailure<IGreaperLibrary*>(Format("Couldn't find the GreaperLibrary '%s'.", libraryUUID.ToString().c_str()));
 }
 
 EmptyResult Application::UnregisterGreaperLibrary(IGreaperLibrary* library)
 {
-	return CreateFailure<EmptyStruct>("Unfinished function '" FUNCTION_FULL "'.");
+	if (library == nullptr)
+		return CreateFailure<EmptyStruct>("Trying to unregister a nullptr GreaperLibrary"sv);
+	
+	const auto nameIT = m_LibraryNameMap.find(library->GetLibraryName());
+	const auto uuidIT = m_LibraryUuidMap.find(library->GetLibraryUuid());
+
+	sizet nIndex = std::numeric_limits<sizet>::max();
+	sizet uIndex = std::numeric_limits<sizet>::max();
+	sizet index = std::numeric_limits<sizet>::max();
+	if (nameIT != m_LibraryNameMap.end())
+	{
+		nIndex = nameIT->second;
+		m_LibraryNameMap.erase(nameIT);
+	}
+	if (uuidIT != m_LibraryUuidMap.end())
+	{
+		uIndex = uuidIT->second;
+		m_LibraryUuidMap.erase(uuidIT);
+	}
+
+	if (nIndex != uIndex)
+	{
+		m_Library->LogWarning(Format("Trying to unregister a GreaperLibrary '%s', but its name and uuid points to different indices.", library->GetLibraryName().data()));
+		if (m_Libraries.size() > nIndex)
+			index = nIndex;
+		else if (m_Libraries.size() > uIndex)
+			index = uIndex;
+	}
+
+	if (m_Libraries.size() <= index)
+		return CreateFailure<EmptyStruct>(Format("Trying to unregister a GreaperLibrary '%s', but it was not registered.", library->GetLibraryName().data()));
+
+	auto& libInfo = m_Libraries[index];
+	m_Library->Log(Format("Unregistering GraeperLibrary '%s'.", library->GetLibraryName().data()));
+	for (auto*& iface : libInfo.Interfaces)
+	{
+		if (iface == nullptr)
+			continue;
+
+		if (iface->IsActive())
+		{
+			StopInterfaceDefault(iface->GetInterfaceUUID());
+		}
+
+	}
+
+
+	return CreateFailure<EmptyStruct>(Format("Trying to unregister a GreaperLibrary named '%s', but was not registered.", library->GetLibraryName().data()));
 }
 
 EmptyResult Application::RegisterInterface(IInterface* interface)
@@ -194,9 +261,19 @@ EmptyResult Application::UnregisterInterface(IInterface* interface)
 	return CreateFailure<EmptyStruct>("Unfinished function '" FUNCTION_FULL "'.");
 }
 
-void Application::MakeInterfaceDefault(IInterface* interface)
+EmptyResult Application::MakeInterfaceDefault(IInterface* interface)
 {
+	return CreateFailure<EmptyStruct>("Unfinished function '" FUNCTION_FULL "'.");
+}
 
+EmptyResult Application::StopInterfaceDefault(const Uuid& interfaceUUID)
+{
+	return CreateFailure<EmptyStruct>("Unfinished function '" FUNCTION_FULL "'.");
+}
+
+EmptyResult Application::StopInterfaceDefault(const StringView& interfaceName)
+{
+	return CreateFailure<EmptyStruct>("Unfinished function '" FUNCTION_FULL "'.");
 }
 
 Result<IInterface*> Application::GetInterface(const Uuid& interfaceUUID) const

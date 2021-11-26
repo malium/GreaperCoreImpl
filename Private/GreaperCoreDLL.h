@@ -35,6 +35,10 @@ namespace greaper::core
 
 		void InitReflection()override;
 
+		void DeinitReflection()override;
+
+		void DeinitManagers()override;
+
 		void DeinitLibrary()override;
 
 		const Uuid& GetLibraryUuid()const override { return LibraryUUID; }
