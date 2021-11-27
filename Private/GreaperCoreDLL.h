@@ -12,14 +12,31 @@
 
 #include "ImplPrerequisites.h"
 #include <Core/IGreaperLibrary.h>
+#include <Core/ILogManager.h>
+
+namespace greaper
+{
+	class IInterface;
+}
 
 namespace greaper::core
 {
 	class GreaperCoreLibrary : public IGreaperLibrary
 	{
-		bool RegisterProperty(IProperty* property)override;
+		EmptyResult RegisterProperty(IProperty* property)override;
 		IApplication* m_Application = nullptr;
 		Library m_Library;
+		ILogManager* m_LogManager = nullptr;
+		bool m_LogManagerActivated = false;
+		EventHandler<IInterface*> m_OnNewLogManager;
+		EventHandler<bool> m_OnLogActivation;
+		void DumpLogsToLogManager();
+		void OnNewLogManager(greaper::IInterface* nlog);
+		void OnLogActivation(bool activated);
+		Vector<greaper::LogData> m_InitLogs;
+
+		UnorderedMap<StringView, sizet> m_PropertyMap;
+		Vector<IProperty*> m_Properties;
 
 	public:
 		static constexpr Uuid LibraryUUID = Uuid{ 0xDAC703FC, 0x16BD4F59, 0xB62D28ED, 0x3C9DE087 };
@@ -49,9 +66,9 @@ namespace greaper::core
 
 		const Library* GetOSLibrary()const override { return &m_Library; }
 
-		Vector<IProperty*> GetPropeties()const override;
+		CRange<IProperty*> GetPropeties()const override;
 
-		Result<IProperty*> GetProperty(const String& name)const override;
+		Result<IProperty*> GetProperty(const StringView& name)const override;
 
 		void LogVerbose(const String& message)override;
 

@@ -4,27 +4,27 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugStatic|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseStatic|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FullReleaseDLL|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FullReleaseStatic|x64'">
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)bin\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)..\bin\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

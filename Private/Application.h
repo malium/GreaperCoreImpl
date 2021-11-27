@@ -19,6 +19,7 @@ namespace greaper::core
 		IGreaperLibrary* m_Library;
 		ApplicationConfig m_Config;
 		OnCloseEvent_t m_OnClose;
+		OnInterfaceActivationEvent_t m_OnInterfaceActivation;
 		InitializationEvt_t m_OnInitialization;
 		ActivationEvt_t m_OnActivation;
 		bool m_IsActive;
@@ -37,9 +38,13 @@ namespace greaper::core
 		UnorderedMap<Uuid, size_t> m_LibraryUuidMap;
 		Vector<LibInfo> m_Libraries;
 
+		mutable Mutex m_ActiveMutex;
 		UnorderedMap<StringView, size_t> m_ActiveInterfaceNameMap;
 		UnorderedMap<Uuid, size_t> m_ActiveInterfaceUuidMap;
 		Vector<IInterface*> m_ActiveInterfaces;
+
+		mutable Mutex m_ToAddMutex;
+		Vector<IInterface*> m_InterfacesToAdd;
 
 		void AddGreaperLibrary(IGreaperLibrary* library);
 		void LoadConfigLibraries();
@@ -82,15 +87,13 @@ namespace greaper::core
 
 		const ApplicationConfig& GetConfig()const override { return m_Config; }
 
-		void OnChangingDefault(IApplication* newDefault)override
+		void OnChangingDefault(IInterface* newDefault)override
 		{
 			UNUSED(newDefault);
 			Break("Cannot change the full application at runtime.");
 		}
 
 		ChangingDefaultEvt_t* const GetChangingDefaultEvent() { return nullptr; }
-
-		EmptyResult RegisterGreaperLibrary(IGreaperLibrary* library)override;
 
 		Result<IGreaperLibrary*> RegisterGreaperLibrary(const WStringView& libPath)override;
 
@@ -104,15 +107,15 @@ namespace greaper::core
 
 		EmptyResult UnregisterInterface(IInterface* interface)override;
 
-		EmptyResult MakeInterfaceDefault(IInterface* interface)override;
+		EmptyResult ActivateInterface(IInterface* interface)override;
 
-		EmptyResult StopInterfaceDefault(const Uuid& interfaceUUID)override;
+		EmptyResult DeactivateInterface(const Uuid& interfaceUUID)override;
 
-		EmptyResult StopInterfaceDefault(const StringView& interfaceName)override;
+		EmptyResult DeactivateInterface(const StringView& interfaceName)override;
 
-		Result<IInterface*> GetInterface(const Uuid& interfaceUUID)const  override;
+		Result<IInterface*> GetActiveInterface(const Uuid& interfaceUUID)const  override;
 
-		Result<IInterface*> GetInterface(const StringView& interfaceName)const override;
+		Result<IInterface*> GetActiveInterface(const StringView& interfaceName)const override;
 
 		Result<IInterface*> GetInterface(const Uuid& interfaceUUID, const Uuid& libraryUUID)const override;
 
@@ -129,6 +132,8 @@ namespace greaper::core
 		void StopApplication()override;
 
 		OnCloseEvent_t* const GetOnCloseEvent()override { return &m_OnClose; }
+
+		OnInterfaceActivationEvent_t* const GetOnInterfaceActivationEvent() { return nullptr; }
 
 		const StringView& GetApplicationName()const override { return m_Config.ApplicationName; }
 
